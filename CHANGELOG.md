@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.1.0 — 2026-06-07
+
+Bilingual release — English + Polish.
+
+- Added Polish skill `pre-deploy-security-review-pl` (SKILL.md + all four reference
+  files, native-quality Polish).
+- Added `README.pl.md` (with EN/PL language switcher) and `prompt.pl.md`.
+- `install.sh` now installs both language variants for each agent.
+- Test suite extended to cover the Polish skill's structure and content invariants.
+
 ## 1.0.0 — 2026-06-07
 
 Initial release.

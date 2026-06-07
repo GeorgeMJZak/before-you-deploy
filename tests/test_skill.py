@@ -87,3 +87,42 @@ def test_prompt_file_is_self_contained():
     prompt = (REPO_ROOT / "prompt.md").read_text(encoding="utf-8")
     assert "senior application security engineer" in prompt.lower()
     assert "PRIORITIZED PUNCH LIST" in prompt
+
+
+# --- Polish (PL) variant -----------------------------------------------------
+
+PL_DIR = REPO_ROOT / "skills" / "pre-deploy-security-review-pl"
+PL_REFERENCES = PL_DIR / "references"
+
+
+def test_pl_skill_exists():
+    assert (PL_DIR / "SKILL.md").is_file()
+
+
+def test_pl_reference_files_present():
+    expected = {"checklist.md", "severity-rubric.md", "ai-specific-risks.md", "report-format.md"}
+    present = {p.name for p in PL_REFERENCES.glob("*.md")}
+    assert expected <= present, f"missing PL reference files: {expected - present}"
+
+
+def test_pl_honesty_guardrails_present():
+    text = (PL_DIR / "SKILL.md").read_text(encoding="utf-8")
+    for marker in ("[POTWIERDZONE]", "[PODEJRZEWANE]", "LISTĄ ZADAŃ WG PRIORYTETU"):
+        assert marker in text, f"PL SKILL.md missing guardrail: {marker}"
+
+
+def test_pl_four_severities_defined():
+    text = (PL_REFERENCES / "severity-rubric.md").read_text(encoding="utf-8")
+    for level in ("KRYTYCZNY", "WYSOKI", "ŚREDNI", "NISKI"):
+        assert level in text, f"PL severity rubric missing {level}"
+
+
+def test_pl_prompt_is_self_contained():
+    prompt = (REPO_ROOT / "prompt.pl.md").read_text(encoding="utf-8")
+    assert "inżynier bezpieczeństwa aplikacji" in prompt.lower()
+    assert "LISTĄ ZADAŃ WG PRIORYTETU" in prompt
+
+
+def test_readme_pl_exists_and_links_back():
+    readme_pl = (REPO_ROOT / "README.pl.md").read_text(encoding="utf-8")
+    assert "README.md" in readme_pl  # language switcher back to English

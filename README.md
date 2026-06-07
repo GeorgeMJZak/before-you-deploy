@@ -1,5 +1,7 @@
 <div align="center">
 
+**🇬🇧 English** · [🇵🇱 Polski](README.pl.md)
+
 # 🛡️ Before You Deploy
 
 ### A pre-deploy security review that any AI agent can run on your real code
@@ -109,24 +111,29 @@ applied** — AIs sometimes claim a fix they didn't make. Re-run before every de
 
 ```
 before-you-deploy/
-├── skills/pre-deploy-security-review/
-│   ├── SKILL.md                    # the skill (loads on demand)
-│   └── references/
-│       ├── checklist.md            # the full 8-category checklist
-│       ├── severity-rubric.md      # CRITICAL/HIGH/MEDIUM/LOW definitions
-│       ├── ai-specific-risks.md    # category 7 + EU AI Act touchpoints
-│       └── report-format.md        # output format + fix-verification rules
+├── skills/
+│   ├── pre-deploy-security-review/      # skill (English)
+│   │   ├── SKILL.md                     # the skill (loads on demand)
+│   │   └── references/
+│   │       ├── checklist.md             # the full 8-category checklist
+│   │       ├── severity-rubric.md       # CRITICAL/HIGH/MEDIUM/LOW definitions
+│   │       ├── ai-specific-risks.md     # category 7 + EU AI Act touchpoints
+│   │       └── report-format.md         # output format + fix-verification rules
+│   └── pre-deploy-security-review-pl/   # skill (Polski) — same structure, in Polish
 ├── adapters/
-│   ├── AGENTS.md                   # Codex / Cursor / agents.md convention
-│   ├── GEMINI.md                   # Gemini CLI context form
+│   ├── AGENTS.md                        # Codex / Cursor / agents.md convention
+│   ├── GEMINI.md                        # Gemini CLI context form
 │   └── gemini-commands/
-│       └── security-review.toml    # /security-review slash command
-├── prompt.md                       # raw copy-paste prompt (no install)
-├── install.sh                      # one-command install per agent
-├── scripts/validate_skill.py       # SKILL.md standard validator (stdlib only)
-├── tests/test_skill.py             # pytest suite (compliance + content invariants)
-└── .github/workflows/ci.yml        # validate + test on every push/PR
+│       └── security-review.toml         # /security-review slash command
+├── prompt.md / prompt.pl.md             # raw copy-paste prompt (no install) — EN + PL
+├── install.sh                           # one-command install per agent
+├── scripts/validate_skill.py            # SKILL.md standard validator (stdlib only)
+├── tests/test_skill.py                  # pytest suite (compliance + content invariants)
+└── .github/workflows/ci.yml             # validate + test on every push/PR
 ```
+
+> 🇵🇱 **Polski:** the Polish skill lives in `skills/pre-deploy-security-review-pl/`.
+> Full Polish docs in **[README.pl.md](README.pl.md)**.
 
 ---
 

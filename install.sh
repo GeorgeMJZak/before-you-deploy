@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
-# Install the pre-deploy-security-review skill for your AI agent.
+# Install the pre-deploy-security-review skill(s) for your AI agent.
+# Installs both language variants found under skills/ (English + Polish).
 #
 #   ./install.sh claude   # -> ~/.claude/skills/
 #   ./install.sh codex    # -> ~/.agents/skills/
@@ -9,30 +10,36 @@
 # Run with no argument for usage. Copies are non-destructive (asks before overwrite).
 set -euo pipefail
 
-SKILL="pre-deploy-security-review"
-SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/skills/$SKILL"
-CMD_SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/adapters/gemini-commands/security-review.toml"
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+SKILLS_DIR="$ROOT/skills"
+CMD_SRC="$ROOT/adapters/gemini-commands/security-review.toml"
 
 die() { echo "error: $*" >&2; exit 1; }
-[ -d "$SRC" ] || die "skill source not found at $SRC"
+[ -d "$SKILLS_DIR" ] || die "skills/ not found at $SKILLS_DIR"
 
-copy_to() {
-  local dest_root="$1" dest="$1/$SKILL"
+copy_skills_to() {
+  local dest_root="$1"
   mkdir -p "$dest_root"
-  if [ -e "$dest" ]; then
-    read -r -p "  $dest exists. Overwrite? [y/N] " ans
-    [[ "$ans" =~ ^[Yy]$ ]] || { echo "  skipped"; return; }
-    rm -rf "$dest"
-  fi
-  cp -R "$SRC" "$dest"
-  echo "  installed -> $dest"
+  for src in "$SKILLS_DIR"/*/; do
+    [ -f "$src/SKILL.md" ] || continue
+    local name dest
+    name="$(basename "$src")"
+    dest="$dest_root/$name"
+    if [ -e "$dest" ]; then
+      read -r -p "  $dest exists. Overwrite? [y/N] " ans
+      [[ "$ans" =~ ^[Yy]$ ]] || { echo "  skipped $name"; continue; }
+      rm -rf "$dest"
+    fi
+    cp -R "${src%/}" "$dest"
+    echo "  installed -> $dest"
+  done
 }
 
-install_claude() { echo "Claude Code:"; copy_to "$HOME/.claude/skills"; }
-install_codex()  { echo "Codex:";       copy_to "$HOME/.agents/skills"; }
+install_claude() { echo "Claude Code:"; copy_skills_to "$HOME/.claude/skills"; }
+install_codex()  { echo "Codex:";       copy_skills_to "$HOME/.agents/skills"; }
 install_gemini() {
   echo "Gemini CLI:"
-  copy_to "$HOME/.gemini/skills"
+  copy_skills_to "$HOME/.gemini/skills"
   mkdir -p "$HOME/.gemini/commands"
   cp "$CMD_SRC" "$HOME/.gemini/commands/security-review.toml"
   echo "  slash command -> ~/.gemini/commands/security-review.toml  (run /security-review)"
@@ -47,13 +54,15 @@ case "${1:-}" in
     cat <<EOF
 Usage: ./install.sh <claude|codex|gemini|all>
 
-  claude   copy skill to ~/.claude/skills/$SKILL
-  codex    copy skill to ~/.agents/skills/$SKILL
-  gemini   copy skill to ~/.gemini/skills/$SKILL + /security-review command
+  claude   copy skills to ~/.claude/skills/
+  codex    copy skills to ~/.agents/skills/
+  gemini   copy skills to ~/.gemini/skills/ + /security-review command
   all      install for every agent above
 
-For project-scoped installs, copy skills/$SKILL into the repo's
-.claude/skills/ , .agents/skills/ , or .gemini/skills/ directory instead.
+Installs both language variants (pre-deploy-security-review and
+pre-deploy-security-review-pl). For a project-scoped install, copy the skill
+folder you want into the repo's .claude/skills/ , .agents/skills/ , or
+.gemini/skills/ directory instead.
 EOF
     exit 1 ;;
 esac
