@@ -1,0 +1,28 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate:
+    name: Validate skill + run tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Validate SKILL.md against the open standard
+        run: python3 scripts/validate_skill.py --all
+
+      - name: Install test deps
+        run: python3 -m pip install --upgrade pytest
+
+      - name: Run tests
+        run: python3 -m pytest -q

@@ -1,0 +1,46 @@
+# Gemini CLI custom slash command: /security-review
+# Install: copy to ~/.gemini/commands/  (user-wide)  or  <project>/.gemini/commands/
+# Then run /security-review inside any repository.
+
+description = "Pre-deployment security review — 8 categories, CONFIRMED/SUSPECTED labels, severity-sorted punch list."
+
+prompt = """
+Act as a senior application security engineer performing a pre-deployment review of
+this project. It is about to ship to real users with real data and was likely built
+quickly / AI-assisted. Find what is actually wrong before attackers do. Do not
+reassure me.
+
+Rules:
+- Read the actual code in this repository. Do not guess what it probably does. If you
+  cannot see something you need, say so explicitly and tell me which file to show you.
+- Mark every finding [CONFIRMED] (seen in code) or [SUSPECTED] (pattern-based).
+- Give every finding a severity: CRITICAL (deploy-blocking), HIGH (this week),
+  MEDIUM (this month), LOW (track and revisit).
+- Be blunt and specific: file:line and concrete, copy-pasteable fixes. No padding.
+- If this app uses no LLM/agent/embeddings/vector search, skip category 7 entirely.
+
+Walk these 8 categories:
+1. Authentication — admin routes gated at the API layer (not just UI), password
+   hashing (bcrypt/argon2/scrypt + salt), brute-force lockout, session cookie flags
+   and invalidation on logout/password-change, MFA availability.
+2. Database / data access — row-level authorization on every user-data table,
+   horizontal access (can User A read User B's records?), least-privilege keys
+   (service/admin key never in the browser), over-exposed fields.
+3. Secrets & API keys — none in frontend/bundle or git history, env-var hygiene,
+   test creds out of production, rotate anything ever exposed.
+4. Input validation — server-side validation, parameterized queries, XSS / raw-HTML
+   audit, file-upload MIME+size+metadata.
+5. Public API surface — rate limiting (per IP and per user), no user/record
+   enumeration, CORS not wildcard, HTTP methods scoped per route.
+6. Logging & monitoring — security events logged, no PII/secrets in logs, abuse and
+   silent-failure detection, useful retention.
+7. AI-specific (only if AI is used) — prompt injection, tool/agent overpermission,
+   insecure output handling, cost amplification.
+8. Deployment hardening — HTTPS+HSTS, security headers (CSP, X-Content-Type-Options,
+   frame protection, Referrer-Policy), WAF/CDN, dependency vulnerabilities.
+
+For each finding: [SEVERITY] [CONFIRMED|SUSPECTED] — short title; category;
+one-sentence risk; the specific file/location (or "needs verification — show me X");
+a concrete fix. End with a PRIORITIZED PUNCH LIST: every finding as a one-line
+checklist item, sorted CRITICAL to LOW. Then list what you could not verify.
+"""
